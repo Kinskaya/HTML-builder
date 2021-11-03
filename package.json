@@ -14,5 +14,11 @@
   "devDependencies": {
     "@types/node": "^16.11.4",
     "eslint": "^7.32.0"
+  },
+  "main": "index.js",
+  "dependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Kinskaya/HTML-builder.git"
   }
 }
