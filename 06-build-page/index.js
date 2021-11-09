@@ -10,10 +10,13 @@ fs.mkdir(path.join(filePath, 'project-dist'),  { recursive: true },  err => {
 });
 
 const projectDist = path.join(filePath, 'project-dist');
+const testDist = path.join(filePath, 'test-files');
 
 const articles = path.join(filePath, 'components', 'articles.html');
 const footer = path.join(filePath, 'components', 'footer.html');
 const header = path.join(filePath, 'components', 'header.html');
+const about = path.join(testDist, 'components', 'about.html');
+
 const writeStream = fs.createWriteStream(path.join(projectDist, 'index.html'));
 
 fs.readFile(path.join(filePath, 'template.html'), (err, data) => {
@@ -26,8 +29,11 @@ fs.readFile(path.join(filePath, 'template.html'), (err, data) => {
       template = template.replace('{{articles}}', data.toString());
       fs.readFile(footer, (err, data) => {
         template = template.replace('{{footer}}', data.toString());
-        let array = template.toString().split('\n');
-        array.forEach(value => writeStream.write(value));
+        fs.readFile(about, (err, data) => {
+          template = template.replace('{{about}}', data.toString());
+          let array = template.toString().split('\n');
+          array.forEach(value => writeStream.write(value));
+        });
       });
     });
   });
@@ -67,29 +73,27 @@ fs.mkdir(path.join(projectDist, 'assets'),  { recursive: true },  err => {
 
 const assetsDist = path.join(projectDist, 'assets');
 
-fs.readdir(assetsPath, {withFileTypes: true},((err, files) => {
-  let current;
-  for (let i = 0; i < files.length; i++) {
-    if (files[i].isDirectory()) {
-      current = files[i].name;
+fs.readdir(assetsPath, {withFileTypes: true},((err, items) => {
+  for (let i = 0; i < items.length; i++) {
+    if (items[i].isDirectory()) {
+      let current = items[i].name;
 
-      fs.mkdir(path.join(assetsDist, current), { recursive: true }, err => {
+      fs.readdir(path.join(assetsPath, items[i].name), (err, files) => {
         if (err) {
           console.log(err);
         }
-
-        fs.readdir(path.join(assetsPath, current), (err, files) => {
+        fs.mkdir(path.join(assetsDist, items[i].name), { recursive: true }, err => {
           if (err) {
             console.log(err);
           }
-          for (let i = 0; i < files.length; i += 1) {
-            fs.copyFile(`${path.join(assetsPath, current)}/${files[i]}`, `${path.join(assetsDist, current)}/${files[i]}`, err => {
-              if (err) {
-                console.log(err);
-              }
-            });
-          }
         });
+        for (let i = 0; i < files.length; i += 1) {
+          fs.copyFile(path.join(assetsPath, current, files[i]), path.join(assetsDist, current, files[i]), err => {
+            if (err) {
+              console.log(err);
+            }
+          });
+        }
       });
     }
   }
