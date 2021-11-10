@@ -2,19 +2,16 @@ const path = require('path');
 const fs = require('fs');
 
 const filePath = path.dirname(__filename);
+const secretFolderPath = path.join(filePath, 'secret-folder');
 
-function getInfo (dir) {
+function getInfo(dir) {
 
-  fs.readdir(dir, {withFileTypes: true}, (err, files) => {
+  fs.readdir(secretFolderPath, {withFileTypes: true}, (err, files) => {
     if (err) {
       throw err;
     }
     for (let i = 0; i < files.length; i++) {
-      if (files[i].isDirectory()) {
-        let newDir = path.join(dir, files[i].name);
-        getInfo(newDir);
-
-      } else {
+      if (files[i].isFile()) {
         fs.stat(path.join(dir, files[i].name), (err, stats) => {
           if (err) {
             console.log(err);
@@ -31,4 +28,4 @@ function getInfo (dir) {
     }
   });
 }
-getInfo(filePath);
+getInfo(secretFolderPath);
