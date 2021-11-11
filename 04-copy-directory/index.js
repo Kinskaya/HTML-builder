@@ -12,13 +12,18 @@ function copyDir() {
         copy = `${files[i].name}-copy`;
 
         fs.readdir(path.join(filePath, copy), (err, files) => {
-          if (err) {
-            console.log(err);
-          }
-          for (let file of files) {
-            fs.unlink(path.join(path.join(filePath, copy), file), err => {
-              if (err) throw err;
-            });
+          if (err && err.code === 'ENOENT') {
+            return;
+          } else {
+            for (let file of files) {
+              if (files) {
+                fs.unlink(path.join(path.join(filePath, copy), file), err => {
+                  if (err) {
+                    console.log(err);
+                  }
+                });
+              }
+            }
           }
         });
 
